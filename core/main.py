@@ -2,7 +2,7 @@ import telebot
 from googletrans import Translator
 import os
 
-API_TOKEN = os.environ.get["API_TOKEN"]
+API_TOKEN = os.environ.get("API_TOKEN")
 
 bot = telebot.TeleBot(API_TOKEN)
 translator = Translator()
