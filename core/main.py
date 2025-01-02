@@ -42,6 +42,10 @@ translator = Translator()
 #def start_message(message):
 #    bot.reply_to(message, "this is audio content")
 
+@bot.message_handler(regexp="hamid reza")
+def start_message(message):
+    bot.reply_to(message, "at this text hamid reza exists")
+
 
 
 
