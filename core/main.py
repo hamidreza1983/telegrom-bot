@@ -44,7 +44,36 @@ def send_from_user(message):
         else:
             user_image_database[user_id].append(file_id)
 
+@bot.message_handler(commands=["take"])
+def start_message(message):
+    bot.reply_to(message, """
+                 please insert your image unique id
+                 """)
+    bot.register_next_step_handler(message, send_image_for_user)
 
+
+def send_image_for_user(message):
+    user_id = message.chat.id
+    image_id = message.text
+    if user_id in user_image_database:
+        for id in user_image_database[user_id]:
+            if image_id == id:
+                file_info = bot.get_file(image_id)
+                file = bot.download_file(file_info.file_path)
+                bot.send_photo(user_id, file)
+                break
+        else:
+            bot.send_message(user_id, "you have not any file in my database")
+    else:
+        user_image_database[user_id] = []
+        bot.send_message(user_id, "you have not any file in my database")
+
+
+
+
+
+
+bot.infinity_polling()
 
 #@bot.message_handler(commands=["send_photo"])
 #def send_photo_file(message):
@@ -80,7 +109,7 @@ def send_from_user(message):
 #        f.write(picture)
 #    bot.send_photo(message.chat.id, picture)
 
-bot.infinity_polling()
+
 
 
 
