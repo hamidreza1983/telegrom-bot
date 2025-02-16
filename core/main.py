@@ -5,23 +5,17 @@ import sqlite3
 from pymongo import MongoClient
 
 
-
 API_TOKEN = os.environ.get("API_TOKEN")
-
 bot = telebot.TeleBot(API_TOKEN)
 
+client = MongoClient("mongodb://localhost:27017")
+db = client["commercial"]
+collection = db["users"]
 
 @bot.message_handler(commands=["start"])
 def start_message(message):
-    try:
-        client = MongoClient("mongodb://localhost:27017")
-        db = client["commercial"]
-        collection = db["users"]
-        resault = collection.insert_one({"name": "hamid"})
-        print (resault.inserted_id)
-        bot.send_message(message.chat.id, "<b><i>WELCOME TO MY BOT</i></b>", parse_mode="HTML")
-    except:
-        print ("sorry")
+    bot.send_message(message.chat.id, "<b><i>WELCOME TO MY BOT</i></b>", parse_mode="HTML")
+
 
 
 
