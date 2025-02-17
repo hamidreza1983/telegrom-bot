@@ -9,12 +9,75 @@ API_TOKEN = os.environ.get("API_TOKEN")
 bot = telebot.TeleBot(API_TOKEN)
 
 client = MongoClient("mongodb://localhost:27017")
-db = client["commercial"]
+db = client["group"]
 collection = db["users"]
+
+GROUP_CHAT_ID = os.environ.get("GROUP_CHAT_ID")
+ADMIN_ID = os.environ.get("ADMIN_ID")
+
+bad_words = ["bad", "salm", "bi adab"]
+
+
+@bot.message_handler(content_types=["new_chat_members"])
+def new_user(message):
+    for user in message.new_chat_members:
+        userdb = collection.find_one({"user_id" : user.id})
+        if userdb is None : 
+            collection.insert_one({"user_id" : user.id, "username" : user.username})
+            bot.send_message(GROUP_CHAT_ID, f"welcome user {user.first_name}")
+        else:
+            bot.send_message(GROUP_CHAT_ID, f"rafti dorato zadi oomadi {user.first_name}")
+
+@bot.message_handler(commands=["today_music"])
+def today_music(message): 
+    if message.from_user.id == int(ADMIN_ID):
+        bot.send_message(GROUP_CHAT_ID, "برای دریافت موزیک امروز دستور موزیک را در تولبار اجرا کنید")
+
+@bot.message_handler(commands=["music"])
+def send_music(message): 
+    user_id = message.from_user.id
+    file = open(r"C:\Users\Administrator\Desktop\telegrom-bot\music\1.mp3", "rb")
+    bot.send_audio(user_id, file)
 
 @bot.message_handler(commands=["start"])
 def start_message(message):
-    bot.send_message(message.chat.id, "<b><i>WELCOME TO MY BOT</i></b>", parse_mode="HTML")
+    if message.from_user.id == int(ADMIN_ID):
+        markup = types.ReplyKeyboardMarkup()
+        btn1 = types.KeyboardButton("btn1")
+        btn2 = types.KeyboardButton("btn2")
+        btn3 = types.KeyboardButton("btn3")
+        markup.add(btn1, btn2, btn3)
+        bot.send_message(GROUP_CHAT_ID, f"من ربات آموزشگاه هستم از امکانات استفاده کنید", reply_markup=markup)
+    else:
+        bot.send_message(message.chat.id, "شما اجازه دستورات را ندارید")
+
+@bot.message_handler(commands=["get_admin"])
+def get_admin_id(message):
+    admins = bot.get_chat_administrators(GROUP_CHAT_ID)
+    text = "admin username for you...\n\n"
+    for admin in admins:
+        if admin.user.username == "t_im_403_bot":
+            pass
+        else:
+            
+            text = text + "@" + admin.user.username + "\n"
+    #bot.send_message(GROUP_CHAT_ID, text)
+    bot.send_message(message.from_user.id, text)
+
+
+@bot.message_handler(func=lambda message:True)
+def check_word(message):
+    msg = message.text
+    user = message.from_user.id
+    for word in bad_words:
+        if word in msg:
+            bot.send_message(message.chat.id, f"you kicked...")
+            bot.kick_chat_member(GROUP_CHAT_ID, user)
+        else:
+            pass
+
+
+
 
 
 
