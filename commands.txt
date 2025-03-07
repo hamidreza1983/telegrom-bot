@@ -1,0 +1,15 @@
+sudo apt install git
+git config --global user.name <your username>
+git config --global user.email <your email>
+git clone <repo url>
+==================================================
+sudo apt update
+sudo apt install apt-transport-https ca-certificates curl software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
+sudo apt install docker-ce 
+sudo systemctl status docker
+sudo useradd -aG docker hamid
+docker compose up --build
+==========================================
+
