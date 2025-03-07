@@ -1,0 +1,66 @@
+services:
+  bot:
+    build: .
+    env_file:
+      - .env
+    container_name: bot
+    command: python core/main.py
+    volumes:
+     - .:/telegrom-bot
+    depends_on:
+      - mongodb
+      - redis
+      - celery-worker-1
+      - celery-worker-2
+      - celery-beat
+    environment:
+      MONGO_URI: "mongodb://mongodb:27017/"
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+
+  redis:
+    image: redis:latest
+    container_name: redis_cache
+    restart: always
+    ports:
+      - "6379:6379"
+
+  celery-worker-1:
+    build: .
+    command: celery -A core.tasks worker --loglevel=info
+    depends_on:
+      - redis
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    volumes:
+     - .:/telegrom-bot
+
+  celery-worker-2:
+    build: .
+    command: celery -A core.tasks worker --loglevel=info
+    depends_on:
+      - redis
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    volumes:
+     - .:/telegrom-bot
+
+  celery-beat:
+    build: .
+    command: celery -A core.tasks beat --loglevel=info
+    depends_on:
+      - redis
+      - celery-worker-1
+      - celery-worker-2
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    volumes:
+     - .:/telegrom-bot
