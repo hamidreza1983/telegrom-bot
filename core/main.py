@@ -3,22 +3,16 @@ import os
 from telebot import types
 import sqlite3
 from pymongo import MongoClient
-
-
+from caching import get_or_set_on_cache
+import time
 API_TOKEN = os.environ.get("API_TOKEN")
 bot = telebot.TeleBot(API_TOKEN)
-
-client = MongoClient("mongodb://localhost:27017")
-db = client["group"]
-collection = db["users"]
-
-
-bad_words = ["bad", "salm", "bi adab"]
-
+from tasks import test
 
 @bot.message_handler(commands=["start"])
 def start(message):
-    bot.reply_to(message, "hello from docker container")
+    #user = get_or_set_on_cache(message.from_user.__dict__)
+    bot.reply_to(message, "hello")
 
 bot.infinity_polling()
 

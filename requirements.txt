@@ -28,3 +28,5 @@ rfc3986
 six
 sniffio
 urllib3
+redis
+celery
