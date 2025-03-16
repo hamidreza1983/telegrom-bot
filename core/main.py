@@ -11,6 +11,7 @@ from tasks import test
 
 @bot.message_handler(commands=["start"])
 def start(message):
+    test.delay()# run on celery
     #user = get_or_set_on_cache(message.from_user.__dict__)
     bot.reply_to(message, "hello")
 
